@@ -1,7 +1,15 @@
+import argparse
 import requests
 from config import githubToken
 
-repo_url = input("Paste github repo link: ").strip()
+parser = argparse.ArgumentParser(description="Print a GitHub repo's file tree.")
+parser.add_argument("--link", type=str, default=None, help="GitHub repo link")
+parser.add_argument("--only-dir", type=lambda v: v.lower() == "true",
+                     default=False, help="Show only directories (True/False)")
+args = parser.parse_args()
+
+repo_url = args.link or input("Paste github repo link: ")
+repo_url = repo_url.strip()
 
 # Strip trailing slash and .git if present, then split into parts
 parts = repo_url.rstrip("/").removesuffix(".git").split("/")
@@ -11,7 +19,7 @@ repo = parts[-1]
 headers = {
     "Accept": "application/vnd.github+json",
     "Authorization": f"Bearer {githubToken}",
-    "X-GitHub-Api-Version": "2026-03-10"
+    "X-GitHub-Api-Version": "2022-11-28"
 }
 params = {"recursive": "1"}
 
@@ -32,4 +40,6 @@ type_map = {"blob": "file", "tree": "directory"}
 
 for item in data["tree"]:
     kind = type_map.get(item["type"], item["type"])
+    if args.only_dir and kind != "directory":
+        continue
     print(item["path"], "-", kind)
