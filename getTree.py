@@ -7,7 +7,6 @@ parser.add_argument("--link", type=str, default=None, help="GitHub repo link")
 parser.add_argument("--only-dir", type=lambda v: v.lower() == "true",
                      default=False, help="Show only directories (True/False)")
 args = parser.parse_args()
-
 repo_url = args.link or input("Paste github repo link: ")
 repo_url = repo_url.strip()
 
